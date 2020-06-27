@@ -1,8 +1,16 @@
+"""
+Solution to: The cake is not a lie!
+"""
+
+
 def solution(s):
-    """The cake is not a lie! Compute maximum number of equal slices
+    """Compute maximum number of equal slices that the cake can be divided into
 
     Args:
-        s: str, a non-empty string less than 200 characters in length describing the sequence of M&Ms (letters a-z)
+        s: str, a string describing the sequence of M&Ms. String should...
+            be non-empty,
+            have less than 200 chars, and
+            contain one unique character (case-sensitive) for each M&M color.
 
     Returns:
         num_slices: int, maximum number of equal parts that can be cut from the cake without leaving any leftovers
