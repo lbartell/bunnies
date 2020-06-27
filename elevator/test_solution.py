@@ -1,6 +1,6 @@
 from pytest import mark
 
-from second.solution import solution
+from elevator.solution import solution
 
 
 @mark.parametrize("versions, expected", [

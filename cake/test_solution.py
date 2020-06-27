@@ -1,6 +1,6 @@
 from pytest import mark, raises
 
-from first.solution import solution, _factors, _chunks
+from cake.solution import solution, _factors, _chunks
 
 
 @mark.parametrize("num, factors", [
