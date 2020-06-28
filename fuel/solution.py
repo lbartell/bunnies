@@ -1,76 +1,71 @@
 """
 Solution to: Fuel Injection Perfection
 """
-
-
 def solution(pellets):
     """Find the minimum number of operations needed to transform the number of pellets to 1
 
     Args:
-        pellets: number of input fuel pellets
+        pellets: string, specifying number of input fuel pellets
 
     Returns:
         int, minimum number of operations
     """
-    return min_operations(0, pellets)
+    return min_operations(0, int(pellets))
 
 
 def min_operations(steps, num):
-    """Find minimum number of steps required to reduce the given number of pellets
+    """Find minimum number of operations required to reduce the given number of pellets
 
     Args:
-        steps: number of steps (operations) performed previously
+        steps: number of operations performed previously
         num: number of pellets
 
     Returns:
         int, minimum number of operations required
     """
-
-    # Increment number of steps
-    steps += 1
-
-    if num <= 2:
-        # If number is 1 or 2, then path is complete
+    if num <= 1:
+        # If number is 1, then path is complete
         return steps
 
     else:
-        # Find the number of times 2 appears as a factor
-        minus_factors = sum(factor == 2 for factor in factors(num - 1))
-        plus_factors = sum(factor == 2 for factor in factors(num + 1))
+        # Otherwise, follow operation that yields the most factors of two
+        steps += 1
+
+        plus_one_factors = times_divisible_by_two(num + 1)
+        minus_one_factors = times_divisible_by_two(num - 1)
         if num % 2 == 0:
-            divide_factors = sum(factor == 2 for factor in factors(num // 2))
+            div_two_factors = times_divisible_by_two(num // 2)
         else:
-            divide_factors = - 1
+            div_two_factors = -1
 
-        # Follow the path that is the most divisible by two
-        max_factors = max(minus_factors, plus_factors, divide_factors)
-        if minus_factors == max_factors:
-            # Removing one is best path
-            return min_operations(steps, num - 1)
+        max_factors = max(plus_one_factors, minus_one_factors, div_two_factors)
 
-        elif divide_factors == max_factors:
-            # Cutting in half is best path
+        if div_two_factors == max_factors:
             return min_operations(steps, num // 2)
 
-        else:
-            # Adding one is best path
+        if minus_one_factors == max_factors:
+            return min_operations(steps, num - 1)
+
+        if plus_one_factors == max_factors:
             return min_operations(steps, num + 1)
 
 
-def factors(num):
-    """Return list of factors of the given integer
+def times_divisible_by_two(num):
+    """Determine the number of times the given number is divisible by 2
+
+    Count number of trailing zeros in binary representation
 
     Args:
-        num: integer, number to factorize
+        num: integer number
 
     Returns:
-        integer factors of the given number
+        int, number of times the given number is divisible by 2
     """
-    factors = []
-    while num > 1:
-        for index in range(2, num + 1):
-            if num % index == 0:
-                num /= index
-                factors.append(index)
-                break
-    return factors
+    string = bin(num)
+    count = 0
+    for char in reversed(string):
+        if char == "0":
+            count += 1
+        else:
+            break
+    return count
