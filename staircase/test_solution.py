@@ -38,12 +38,9 @@ def test_solution_brute(n):
     """
     # Arrange
     expected = bruce_force_solution(n)
-    print "Expected: " + str(expected)
 
     # Act
     result = solution(n)
-    print "Actual: " + str(result)
 
     # Assert
     assert result == expected
-

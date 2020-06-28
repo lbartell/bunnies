@@ -1,8 +1,5 @@
 """
 Solution to: The Grandest Staircase Of Them All
-
-Simplifies to the Partition Function Q, which gives the number of ways of writing an integer
-as a sum of distinct positive integers, disregarding order
 """
 from math import sqrt
 
@@ -27,8 +24,21 @@ def solution(n):
     return staircases
 
 
+def memoize(f):
+    """Memoization decorator"""
+    memo = {}
+    def helper(x, j):
+        if x not in memo:
+            memo[x] = f(x, j)
+        return memo[x]
+    return helper
+
+
+@memoize
 def partition_q(n, j_sequence):
     """Number of ways of writing an integer as a sum of distinct positive integers, disregarding order
+
+    Uses memoization for efficiency
 
     Algorithm implementation based on:
     https://mathworld.wolfram.com/PartitionFunctionQ.html
@@ -83,7 +93,7 @@ def calc_j_seq(max_n):
     return result
 
 
-# ========== brute force solutions
+# ========== Brute force solutions
 from itertools import combinations, chain
 
 
