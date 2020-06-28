@@ -1,12 +1,13 @@
 from parameterized import parameterized
-from fuel.solution import solution
+from baby.solution import solution
 
 
 @parameterized.expand([
-    ("2", "1", 1),
-    ("4", "7", 4),
+    ("2", "1", "1"),
+    ("4", "7", "4"),
+    ("2", "4", "impossible"),
 ])
-def test_solution(mach, facula, salutes):
+def test_solution(mach, facula, generations):
     """
     Test solution
     """
@@ -16,5 +17,5 @@ def test_solution(mach, facula, salutes):
     result = solution(mach, facula)
 
     # Assert
-    assert result == salutes
+    assert result == generations
 
