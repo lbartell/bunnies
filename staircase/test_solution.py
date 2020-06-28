@@ -21,17 +21,7 @@ def test_solution(n, expected):
     assert result == expected
 
 
-@parameterized.expand([
-    (3,),
-    (4,),
-    (5,),
-    (6,),
-    (7,),
-    (8,),
-    (9,),
-    (10,),
-    (11,),
-])
+@parameterized.expand([(num,) for num in range(15)])
 def test_solution_brute(n):
     """
     Test solution

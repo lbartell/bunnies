@@ -42,6 +42,8 @@ def partition_q(n, j_sequence):
 
     Algorithm implementation based on:
     https://mathworld.wolfram.com/PartitionFunctionQ.html
+    and
+    https://stackoverflow.com/questions/61944559/efficient-algorithm-for-getting-number-of-partitions-of-integer-with-distinct-pa
 
     Args:
         n: integer number to partition
