@@ -1,52 +1,90 @@
 """
 Solution to: The Grandest Staircase Of Them All
+
+Simplifies to the Partition Function Q, which gives the number of ways of writing an integer
+as a sum of distinct positive integers, disregarding order
 """
-from itertools import combinations, chain
+from math import sqrt
 
 
-def solution(bricks):
+def solution(n):
     """The number of different staircases that can be built from exactly n bricks
 
     Args:
         bricks: int, number of bricks used to build the staircase, [3, 200]
 
     Returns:
-
+        int, number of staircase options
     """
 
-    step_size_options = range(1, bricks)
-    num_valid_subsets = subsets_matching_total(step_size_options, bricks)
+    # Calculate the number of paritions of distinct positive integers
+    j_sequence = calc_j_seq(n+1)
+    paritions = partition_q(n, j_sequence)
 
-    return num_valid_subsets
+    # Reduce by 1 because we need at least one step
+    staircases = paritions - 1
+
+    return staircases
 
 
-def subsets_matching_total(my_list, total_sum):
-    """Return number of subset of my_list that add up to total_sum"""
-    count = 0
+def partition_q(n, j_sequence):
+    """Number of ways of writing an integer as a sum of distinct positive integers, disregarding order
 
-    # If the list is short, see if it sums
-    if len(my_list) <= 2:
-        if sum(my_list) == total_sum:
-            count += 1
+    Algorithm implementation based on:
+    https://mathworld.wolfram.com/PartitionFunctionQ.html
 
-    # Otherwise, break down the list
+    Args:
+        n: integer number to partition
+
+    Returns:
+        number of ways of writing an integer
+        as a sum of distinct positive integers, disregarding order
+    """
+    # Break out if zero
+    if n == 0:
+        return 1
+
+    sqrt_n = int(sqrt(n)) + 1
+    q_sum = sum(
+        ((-1) ** (k + 1)) * partition_q(n - k ** 2, j_sequence)
+        for k in range(1, sqrt_n)
+    )
+
+    return s(n, j_sequence) + 2 * q_sum
+
+
+def s(n, j_sequence):
+    if n in j_sequence:
+        return (-1) ** j_sequence[n]
+
     else:
-        # Add number of valid subsets of length 2
-        if my_list[0] > 1:
-            num_two_subsets = len(my_list[: - my_list[0] + 1]) // 2
-        else:
-            num_two_subsets = len(my_list) // 2
-        count += num_two_subsets
-        print str(num_two_subsets) + " tuples totaling " + str(total_sum) + " in " + str(my_list)
+        return 0
 
-        # Add number of valid subsets based on the first element, plus other middle elements
-        count += subsets_matching_total(
-            my_list=my_list[1: - my_list[0]],
-            total_sum=total_sum - my_list[0]
-        )
 
-    print "count: " + str(count) + " sum: " + str(total_sum) + " my_list: " + str(my_list)
-    return count
+def calc_j_seq(max_n):
+    """Used to determine if n of form j*(3*j (+/-) 1) / 2 by creating a dictionary of n, j value pairs
+
+    Args:
+        max_n: int, maximum integer to prepare the dictionary for
+
+    Returns:
+        dictionary if n, j value pairs
+    """
+    result = {}
+    j = 0
+    valn = -1
+    while valn <= max_n:
+      jj = 3 * j ** 2
+      valp, valn = (jj - j) // 2, (jj + j) // 2
+      result[valp] = j
+      result[valn] = j
+      j += 1
+
+    return result
+
+
+# ========== brute force solutions
+from itertools import combinations, chain
 
 
 def bruce_force_solution(bricks):
