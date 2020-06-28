@@ -17,19 +17,28 @@ def solution(mach, facula):
     f = int(facula)
     generations = 0
 
-    while True:
-        if m == f == 1:
-            return str(generations)
+    while not (m == f == 1):
+        if f == 1:
+            # If only one F bomb, subtract as many times as needed
+            generations += m - 1
+            m = 1
 
-        elif m > f:
-            # Subtract number of F bombs from the M bomb count
-            generations += 1
-            m -= f
+        elif m == 1:
+            # If only one M bomb, subtract as many times as needed
+            generations += f - 1
+            f = 1
 
-        elif f > m:
-            # Subtracted number of M bombs from the F bomb count
-            generations += 1
-            f -= m
+        elif m > f > 1:
+            # Subtract number of F bombs from the M bomb count, as many times as possible
+            generations += m // f
+            m = m % f
 
-        else:  # if m == f
+        elif f > m > 1:
+            # Subtracted number of M bombs from the F bomb count, as many times as possible
+            generations += f // m
+            f = f % m
+
+        else:  # if m == f or m < 1 or f < 1
             return "impossible"
+
+    return str(generations)
