@@ -1,6 +1,8 @@
 """
 Solution to: Fuel Injection Perfection
 """
+
+
 def solution(pellets):
     """Find the minimum number of operations needed to transform the number of pellets to 1
 
@@ -10,44 +12,29 @@ def solution(pellets):
     Returns:
         int, minimum number of operations
     """
-    return min_operations(0, int(pellets))
+    n = int(pellets)
+    operations = 0
 
+    while n > 1:
+        # We will be performing an operation
+        operations += 1
 
-def min_operations(steps, num):
-    """Find minimum number of operations required to reduce the given number of pellets
+        # Always best to divide by two, if possible
+        if n % 2 == 0:
+            n = n // 2
 
-    Args:
-        steps: number of operations performed previously
-        num: number of pellets
+        # Catch the edge case of 3, should subtract
+        elif n == 3:
+            n -= 1
 
-    Returns:
-        int, minimum number of operations required
-    """
-    if num <= 1:
-        # If number is 1, then path is complete
-        return steps
+        # Decide between adding and subtracting by which result is more divisible by two
+        elif times_divisible_by_two(n - 1) > times_divisible_by_two(n + 1):
+            n -= 1
 
-    else:
-        # Otherwise, follow operation that yields the most factors of two
-        steps += 1
-
-        plus_one_factors = times_divisible_by_two(num + 1)
-        minus_one_factors = times_divisible_by_two(num - 1)
-        if num % 2 == 0:
-            div_two_factors = times_divisible_by_two(num // 2)
         else:
-            div_two_factors = -1
+            n += 1
 
-        max_factors = max(plus_one_factors, minus_one_factors, div_two_factors)
-
-        if div_two_factors == max_factors:
-            return min_operations(steps, num // 2)
-
-        if minus_one_factors == max_factors:
-            return min_operations(steps, num - 1)
-
-        if plus_one_factors == max_factors:
-            return min_operations(steps, num + 1)
+    return operations
 
 
 def times_divisible_by_two(num):
@@ -68,4 +55,5 @@ def times_divisible_by_two(num):
             count += 1
         else:
             break
+
     return count
