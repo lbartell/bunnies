@@ -55,6 +55,18 @@ Start End Delta Time Status
 With this solution, you would pick up bunnies 1 and 2. This is the best combination for this space station hallway,
 so the answer is [1, 2].
 
+
+[
+[0, 1, 1, 1, 1],
+[1, 0, 1, 1, 1],
+[1, 1, 0, 1, 1],
+[1, 1, 1, 0, 1],
+[1, 1, 1, 1, 0]
+]
+
+
+
+
 Languages
 =========
 

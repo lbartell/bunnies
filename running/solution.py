@@ -6,44 +6,46 @@ from collections import deque
 
 class Path(object):
 
-    def __init__(self, times, path_indices):
+    def __init__(self, times, path_indices, current_time):
         self.times = times
         self.path_indices = path_indices
+        self.current_time = current_time
 
-        # Derived properties
+        # Derived quantities
+        self.current_index = self.path_indices[-1]
         self.num_positions = len(self.times)
         self.all_bunny_indices = set(range(1, self.num_positions - 1))
-        self.current_index = self.path_indices[-1]
-
-        self.saved_bunny_indices = self._get_saved_bunny_indices()
-        self.total_time = self._get_total_time()
-
+        self.saved_bunny_indices = self.all_bunny_indices.intersection(self.path_indices)
+        self.saved_bunnies = set([index - 1 for index in self.saved_bunny_indices])
         self.at_bulkhead = self.current_index == self.num_positions - 1
         self.all_bunnies_saved = not self.all_bunny_indices - self.saved_bunny_indices
-
-    def _get_saved_bunny_indices(self):
-        saved_bunny_indices = set()
-        for index in self.path_indices:
-            if 0 < index < self.num_positions:
-                saved_bunny_indices.add(index)
-        return saved_bunny_indices
-
-    def _get_total_time(self):
-        total_time = 1
-        for start_index, end_index in zip(self.path_indices[:-1], self.path_indices[1:]):
-            total_time += self.times[start_index][end_index]
-        return total_time
+        self.is_valid_path = self.at_bulkhead and self.current_time >= 0
 
     def branches(self):
         branched_paths = list()
 
         for next_step in range(self.num_positions):
-            # Don't stay in the same spot or try to save a bunny that is already saved
-            if next_step not in self.saved_bunny_indices and next_step != self.current_index:
-                new_path = self.path_indices + [next_step]
-                branched_paths.append(new_path)
 
-        return [Path(self.times, steps) for steps in branched_paths]
+            # Exit conditions: Don't..
+            # - stay in the same spot
+            # - try to save a bunny that was already saved
+            # - go to a non-bunny spot that costs time
+            same_spot = next_step == self.current_index
+            saved_bunny = next_step in self.saved_bunny_indices
+            costs_time = self.times[self.current_index][next_step] > 0
+            costly_back_to_start = next_step == 0 and costs_time
+
+            if not same_spot and not saved_bunny and not costly_back_to_start:
+                new_path = self.path_indices + [next_step]
+                branched_paths.append(
+                    Path(
+                        times=self.times,
+                        path_indices=new_path,
+                        current_time=self.current_time - self.times[self.current_index][next_step]
+                    )
+                )
+
+        return branched_paths
 
 
 def solution(times, time_limit):
@@ -64,7 +66,7 @@ def solution(times, time_limit):
     Returns:
         list of integers specifying which bunnies to save
     """
-    paths = deque([Path(times, [0])])
+    paths = deque([Path(times=times, path_indices=[0], current_time=time_limit)])
     valid_paths = []
 
     while paths:
@@ -73,13 +75,18 @@ def solution(times, time_limit):
 
         paths.extend(current_path.branches())
 
-        if current_path.at_bulkhead and current_path.total_time <= time_limit:
+        if current_path.is_valid_path:
             valid_paths.append(current_path)
+
+            if current_path.all_bunnies_saved:
+                break
 
     sorted_paths = sorted(
         valid_paths,
-        key=lambda p: (len(p.saved_bunny_indices), sum(p.saved_bunny_indices))
+        key=lambda p: (len(p.saved_bunny_indices), - sum(p.saved_bunny_indices)),
+        reverse=True
     )
 
-    saved_bunnies = [index - 1 for index in sorted_paths[0].saved_bunny_indices]
+    saved_bunnies = list(sorted_paths[0].saved_bunnies)
+
     return saved_bunnies
