@@ -1,5 +1,5 @@
 """
-Solution to: The Grandest Staircase Of Them All
+Solution to: Running with Bunnies
 """
 from collections import deque
 
@@ -29,10 +29,10 @@ class Path(object):
             # Exit conditions: Don't..
             # - stay in the same spot
             # - try to save a bunny that was already saved
-            # - go to a non-bunny spot that costs time
+            # - go back to the start if it costs time
             same_spot = next_step == self.current_index
             saved_bunny = next_step in self.saved_bunny_indices
-            costs_time = self.times[self.current_index][next_step] > 0
+            costs_time = self.times[self.current_index][next_step] > self.current_time
             costly_back_to_start = next_step == 0 and costs_time
 
             if not same_spot and not saved_bunny and not costly_back_to_start:
