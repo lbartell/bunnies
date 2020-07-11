@@ -22,15 +22,22 @@ class Node(object):
         count_visited = sum([1 for x in visited[1:-1] if x > 0])
         optimal = None
 
+        # awful cycle detection check
         if visited[self.position] < 10:
             for node in self.nodes:
+                # don't stand still
                 if node.position != self.position:
+                    # get the best path starting with that node
                     node_optimal, child_visited_count = node.optimal_child_path(time_remaining - self.time_costs[node.position], visited)
+                    # if there is a valid path, and it has a greater number of bunnies visited, take that
+                    # *not* greater than or equal number of bunnies, that way we will always return the lowest index bunnies for equal paths
+                    # assuming we iterate in order
                     if node_optimal is not None and child_visited_count > count_visited:
                         optimal = node_optimal
                         optimal.appendleft(self.position)
                         count_visited = child_visited_count
 
+        # if nothing has been found so far, the optimal path is the one that ends here, or this is a dead leaf
         if optimal is None and self.is_valid_terminal_node(time_remaining):
             optimal = deque([self.position])
 
@@ -43,17 +50,28 @@ class Graph(object):
         self.time_limit = time_limit
         self.nodes = []
         self.valid_sequences = []
+        # make a node for each row, since the rows correspond to each position
         for i in range(self.dimension):
             self.nodes.append(Node(i, times[i], i == self.dimension - 1))
+
+        # add references to the other nodes because this is a fully connected graph (complete graph)
+        # this way we can traverse the graph from any individual node
         for i in range(self.dimension):
             for j in range(self.dimension):
                 self.nodes[i].nodes.append(self.nodes[j])
 
     def brute(self):
+        # count how many times we've visited each node
         visited = [1]
         for i in range(self.dimension - 1):
             visited.append(0)
+
+        # start from the starting position, i.e. node[0]
         optimal, count_visited = self.nodes[0].optimal_child_path(self.time_limit, visited)
+
+        # convert the paths into bunny prisoner numbers
+        # bunnies are zero-indexed from position 1 in the zero-indexed node list
+        # skip nodes 0 and -1 because they are the start and bulkhead
         bunnies = []
         for i in range(1, self.dimension - 1):
             if i in optimal:
