@@ -2,6 +2,64 @@
 Solution to: Running with Bunnies
 """
 from collections import deque
+from copy import deepcopy
+
+class Node(object):
+
+    def __init__(self, position, time_costs, is_end=False):
+        self.nodes = []
+        self.position = position
+        self.time_costs = time_costs
+        self.to_end_cost = time_costs[-1]
+        self.is_end = is_end
+
+    def is_valid_terminal_node(self, time_remaining):
+        return not self.is_end and time_remaining >= self.to_end_cost
+
+    def optimal_child_path(self, time_remaining, previously_visited):
+        visited = deepcopy(previously_visited)
+        visited[self.position] += 1
+        count_visited = sum([1 for x in visited[1:-1] if x > 0])
+        optimal = None
+
+        if visited[self.position] < 10:
+            for node in self.nodes:
+                if node.position != self.position:
+                    node_optimal, child_visited_count = node.optimal_child_path(time_remaining - self.time_costs[node.position], visited)
+                    if node_optimal is not None and child_visited_count > count_visited:
+                        optimal = node_optimal
+                        optimal.appendleft(self.position)
+                        count_visited = child_visited_count
+
+        if optimal is None and self.is_valid_terminal_node(time_remaining):
+            optimal = deque([self.position])
+
+        return optimal, count_visited
+
+class Graph(object):
+    def __init__(self, times, time_limit):
+        # assume to be square
+        self.dimension = len(times)
+        self.time_limit = time_limit
+        self.nodes = []
+        self.valid_sequences = []
+        for i in range(self.dimension):
+            self.nodes.append(Node(i, times[i], i == self.dimension - 1))
+        for i in range(self.dimension):
+            for j in range(self.dimension):
+                self.nodes[i].nodes.append(self.nodes[j])
+
+    def brute(self):
+        visited = [1]
+        for i in range(self.dimension - 1):
+            visited.append(0)
+        optimal, count_visited = self.nodes[0].optimal_child_path(self.time_limit, visited)
+        bunnies = []
+        for i in range(1, self.dimension - 1):
+            if i in optimal:
+                bunnies.append(i - 1)
+        return bunnies
+
 
 
 class Path(object):
@@ -66,6 +124,12 @@ def solution(times, time_limit):
     Returns:
         list of integers specifying which bunnies to save
     """
+    return JmSolve(times, time_limit)
+
+def JmSolve(times, time_limit):
+    return Graph(times, time_limit).brute()
+
+def LenaSolve(times, time_limit):
     paths = deque([Path(times=times, path_indices=[0], current_time=time_limit)])
     valid_paths = []
 
