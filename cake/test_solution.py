@@ -1,14 +1,14 @@
-from pytest import mark, raises
+from parameterized import parameterized
 
-from cake.solution import solution, _factors, _chunks
+from cake.solution import solution, _factors
 
 
-@mark.parametrize("num, factors", [
+@parameterized.expand([
     (1, [1]),
     (2, [1, 2]),
     (10, [1, 2, 5, 10])
 ])
-def test_factors(num: int, factors: list) -> None:
+def test_factors(num, factors):
     """
     Test factors
     """
@@ -21,20 +21,7 @@ def test_factors(num: int, factors: list) -> None:
     assert result == factors
 
 
-@mark.parametrize("num", [-100, 0])
-def test_factors_error(num) -> None:
-    """
-    Test factors raises error with invalid input
-    """
-    # Arrange
-    num = 0
-
-    # Act / assert
-    with raises(ValueError):
-        _factors(num)
-
-
-@mark.parametrize("s, num_slices", [
+@parameterized.expand([
     ("abcabcabcabc", 4),
     ("abccbaabccba", 2),
     ("abcabcabcabc", 4),
@@ -45,7 +32,7 @@ def test_factors_error(num) -> None:
     ("aaaaaaa", 7),
     ("zxcvbnm", 1),
 ])
-def test_solution(s: str, num_slices: int) -> None:
+def test_solution(s, num_slices):
     """
     Test cake cutting solution
     """
